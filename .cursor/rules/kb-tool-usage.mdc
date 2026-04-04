@@ -1,0 +1,46 @@
+---
+description: Guidance on which KB MCP tool to use and when. Covers the 11 available kb_* tools and their appropriate use cases.
+alwaysApply: true
+---
+
+# KB Tool Usage Conventions
+
+## Read Tools -- Choosing the Right One
+
+| Situation | Tool | Why |
+|-----------|------|-----|
+| Broad question, need context | `kb_context_search` | Full retrieval cascade: entity lookup + structural expansion + FTS, returns budgeted context pack |
+| Targeted lookup by type/tags | `kb_search` | FTS with filters, returns ranked snippets |
+| Know a specific entity name/ID | `kb_get_entity` | Resolves by ID/alias, returns card + backlinks + neighbors + recent sessions |
+| Know the exact file path | `kb_read` | Direct file read, parsed or raw |
+| Want recent activity in a scope | `kb_list_recent` | Recently updated notes, optional directory filter |
+
+Default to `kb_context_search` when unsure. It handles entity resolution and FTS in one call.
+
+## Write Tools -- Always With User Approval
+
+| Tool | Writes to | When to use |
+|------|-----------|-------------|
+| `kb_write_session_summary` | `06-sessions/` | End of a session with meaningful KB interaction |
+| `kb_create_memory_candidate` | `05-agent-memory/candidates/` | Discovered a durable fact worth persisting |
+| `kb_compile_raw` | `01-wiki/` | User wants to compile a raw source into a wiki article |
+| `kb_update_index` | `07-indexes/` | After adding/updating wiki articles, keep indexes current |
+
+Show the user the content before calling any write tool. Do not write silently.
+
+## Maintenance Tools
+
+| Tool | When to use |
+|------|-------------|
+| `kb_lint` | User asks for health check, or proactively before major KB operations |
+| `kb_reindex` | After bulk changes, or if search results seem stale |
+
+## Typical Sequences
+
+**Question answering:** `kb_context_search` -> synthesize answer with citations
+
+**Deep dive on an entity:** `kb_get_entity` -> `kb_read` on linked notes -> synthesize
+
+**Adding knowledge:** user provides content -> prepare note -> show draft -> `kb_compile_raw` or `kb_create_memory_candidate` -> `kb_update_index`
+
+**Session wrap-up:** summarize session -> show draft -> `kb_write_session_summary`

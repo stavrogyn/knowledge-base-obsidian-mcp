@@ -1,4 +1,4 @@
-import { readNote } from "../vault/reader.js";
+import { createHash } from "crypto";
 import { writeNote, type WriteResult } from "../vault/writer.js";
 import { config } from "../config.js";
 
@@ -10,6 +10,7 @@ export interface CompileRawInput {
   entities: string[];
   relatedArticles: string[];
   tags?: string[];
+  directory?: string;
   sessionId?: string;
 }
 
@@ -25,15 +26,22 @@ function sanitizeFilename(name: string): string {
 export function compileRawToWiki(input: CompileRawInput): WriteResult {
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10);
-  const slug = input.title
+  let slug = input.title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .slice(0, 60)
     .replace(/-$/, "");
 
+  if (!slug) {
+    slug = createHash("sha256").update(input.title).digest("hex").slice(0, 12);
+  }
+
   const id = `wiki-${slug}`;
   const safeTitle = sanitizeFilename(input.title);
-  const relativePath = `${config.dirs.wiki}/${safeTitle}.md`;
+  const baseDir = input.directory
+    ? `${config.dirs.wiki}/${input.directory.replace(/^01-wiki\/?/, "").replace(/\/+$/, "")}`
+    : config.dirs.wiki;
+  const relativePath = `${baseDir}/${safeTitle}.md`;
 
   const frontmatter = {
     id,

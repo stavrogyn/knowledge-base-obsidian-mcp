@@ -27,6 +27,7 @@ import {
   handleUpdateIndex,
 } from "./tools/compile.js";
 import { lintToolDef, handleLint, reindexToolDef, handleReindex } from "./tools/lint.js";
+import { createDirectoryToolDef, handleCreateDirectory } from "./tools/directory.js";
 
 const server = new Server(
   {
@@ -56,6 +57,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     updateIndexToolDef,
     lintToolDef,
     reindexToolDef,
+    createDirectoryToolDef,
   ],
 }));
 
@@ -85,6 +87,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return handleLint();
     case "kb_reindex":
       return handleReindex();
+    case "kb_create_directory":
+      return handleCreateDirectory(args as Parameters<typeof handleCreateDirectory>[0]);
     default:
       return {
         content: [{ type: "text", text: `Unknown tool: ${name}` }],

@@ -1,0 +1,57 @@
+---
+description: Core behavioral guardrails for AI agent working with the knowledge base. Enforces grounding, citations, clarification triggers, and write discipline.
+alwaysApply: true
+---
+
+# KB Agent Core Behavior
+
+## Grounding Policy
+
+- NEVER fabricate knowledge. If the KB has no data on a topic, say so: "The KB has no information on this topic."
+- Do NOT blend KB facts with guesses. Clearly separate what comes from the KB vs. general knowledge.
+- When the KB partially covers a topic, explicitly state: "The KB contains X. I don't have KB data on Y."
+
+## Citation Requirement
+
+When answering from KB data, cite the source note by ID or path:
+
+- Inline: `[concept-graphrag](01-wiki/Graph RAG.md)`
+- After a claim: "(source: `proj-kb-system`)"
+
+Never present KB content without attribution.
+
+## Clarification Triggers
+
+MUST ask the user before proceeding when:
+
+- The query is ambiguous and multiple KB areas could match
+- Search returns many results (>15) across different topics
+- The user's request implies a write/update but the target note or section is unclear
+- Confidence in the answer is low (few or weak matches from search)
+- The action is irreversible: promoting memory candidates, compiling wiki articles, updating index files
+
+Use the `AskQuestion` tool for structured clarification when available. Prefer multiple-choice over open-ended questions.
+
+## Tool-First Principle
+
+Always search the KB before answering from general knowledge:
+
+1. Call `kb_context_search` (or `kb_search` + `kb_get_entity`)
+2. Analyze results
+3. Answer with citations, OR ask for clarification if results are ambiguous/insufficient
+
+Do NOT skip the search step and answer from memory.
+
+## Write Discipline
+
+- All agent-written content MUST have `source_type: agent` and `review_status: draft`
+- NEVER overwrite notes where `source_type: human`
+- NEVER delete any note
+- Writes are restricted to: `01-wiki/`, `05-agent-memory/`, `06-sessions/`, `07-indexes/`
+- Always show the user what will be written and get approval before calling any write tool
+- After meaningful sessions, offer to write a session summary
+- When discovering durable facts, offer to create a memory candidate
+
+## Language
+
+Respond in the same language the user writes in.

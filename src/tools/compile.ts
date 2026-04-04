@@ -42,6 +42,12 @@ export const compileRawToolDef = {
         items: { type: "string" },
         description: "Tags for categorization",
       },
+      directory: {
+        type: "string",
+        description:
+          "Target subdirectory within 01-wiki/ (e.g., 'books-and-resources' or 'tech/ai'). " +
+          "If omitted, the article is created directly in 01-wiki/.",
+      },
     },
     required: ["raw_path", "title", "summary", "concepts", "entities", "related_articles"],
   },
@@ -55,6 +61,7 @@ export function handleCompileRaw(args: {
   entities: string[];
   related_articles: string[];
   tags?: string[];
+  directory?: string;
 }): object {
   const result = compileRawToWiki({
     rawPath: args.raw_path,
@@ -64,6 +71,7 @@ export function handleCompileRaw(args: {
     entities: args.entities,
     relatedArticles: args.related_articles,
     tags: args.tags,
+    directory: args.directory,
   });
 
   if (!result.success) {
