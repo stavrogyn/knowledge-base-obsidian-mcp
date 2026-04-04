@@ -1,0 +1,192 @@
+{
+  "description": "Evaluation queries for the knowledge base retrieval system. Run these against the KB to measure search quality, entity resolution, and context assembly.",
+  "queries": [
+    {
+      "id": "eval-01",
+      "category": "entity-lookup",
+      "query": "What is the AI Knowledge Base System?",
+      "expected_entity": "proj-kb-system",
+      "expected_notes": ["02-projects/AI Knowledge Base System.md"],
+      "description": "Direct entity lookup by title"
+    },
+    {
+      "id": "eval-02",
+      "category": "entity-lookup",
+      "query": "Tell me about MCP",
+      "expected_entity": "concept-mcp",
+      "expected_notes": ["01-wiki/Model Context Protocol.md"],
+      "description": "Entity resolution via alias"
+    },
+    {
+      "id": "eval-03",
+      "category": "entity-lookup",
+      "query": "What is GraphRAG?",
+      "expected_entity": null,
+      "expected_notes": [],
+      "description": "Entity not found -- should gracefully return no results"
+    },
+    {
+      "id": "eval-04",
+      "category": "fts-search",
+      "query": "retrieval pipeline multi-stage",
+      "expected_notes": ["01-wiki/Retrieval Cascade.md"],
+      "description": "FTS match on content keywords"
+    },
+    {
+      "id": "eval-05",
+      "category": "fts-search",
+      "query": "session summary agent memory",
+      "expected_notes": ["07-indexes/vault-schema.md", "07-indexes/agent-policy.md"],
+      "description": "FTS match across multiple notes"
+    },
+    {
+      "id": "eval-06",
+      "category": "fts-search",
+      "query": "Obsidian vault structure",
+      "expected_notes": ["07-indexes/vault-schema.md"],
+      "description": "FTS search for vault documentation"
+    },
+    {
+      "id": "eval-07",
+      "category": "context-search",
+      "query": "How does the knowledge base retrieval work?",
+      "expected_top_notes": ["01-wiki/Retrieval Cascade.md", "02-projects/AI Knowledge Base System.md"],
+      "description": "Context search should prioritize concept article and project"
+    },
+    {
+      "id": "eval-08",
+      "category": "context-search",
+      "query": "What are the security rules for the agent?",
+      "expected_top_notes": ["07-indexes/agent-policy.md"],
+      "description": "Context search for policy information"
+    },
+    {
+      "id": "eval-09",
+      "category": "context-search",
+      "query": "What tools does the MCP server expose?",
+      "expected_top_notes": ["01-wiki/Model Context Protocol.md", "02-projects/AI Knowledge Base System.md"],
+      "description": "Context search combining entity + FTS"
+    },
+    {
+      "id": "eval-10",
+      "category": "structural",
+      "query": "What links to the MCP article?",
+      "tool": "kb_get_entity",
+      "entity": "concept-mcp",
+      "expected_backlinks": ["proj-kb-system", "concept-retrieval-cascade"],
+      "description": "Backlink resolution for entity"
+    },
+    {
+      "id": "eval-11",
+      "category": "structural",
+      "query": "What are the neighbors of the KB project?",
+      "tool": "kb_get_entity",
+      "entity": "proj-kb-system",
+      "expected_neighbors_min": 2,
+      "description": "Neighborhood expansion from project entity"
+    },
+    {
+      "id": "eval-12",
+      "category": "write-test",
+      "query": "Write a session summary about testing the KB",
+      "tool": "kb_write_session_summary",
+      "expected_path_prefix": "06-sessions/",
+      "description": "Session summary write to correct location"
+    },
+    {
+      "id": "eval-13",
+      "category": "write-test",
+      "query": "Create a memory candidate about user preference",
+      "tool": "kb_create_memory_candidate",
+      "expected_path_prefix": "05-agent-memory/candidates/",
+      "description": "Memory candidate write to correct location"
+    },
+    {
+      "id": "eval-14",
+      "category": "guardrail",
+      "query": "Try to write to projects directory",
+      "expected_error": true,
+      "description": "Write to non-writable directory should fail"
+    },
+    {
+      "id": "eval-15",
+      "category": "guardrail",
+      "query": "Try to overwrite human-authored note",
+      "expected_error": true,
+      "description": "Overwriting human source_type should fail"
+    },
+    {
+      "id": "eval-16",
+      "category": "lint",
+      "query": "Run lint checks",
+      "tool": "kb_lint",
+      "expected_min_issues": 1,
+      "description": "Lint should find at least template issues"
+    },
+    {
+      "id": "eval-17",
+      "category": "fts-search",
+      "query": "frontmatter schema aliases tags",
+      "expected_notes": ["07-indexes/vault-schema.md"],
+      "description": "Technical schema terminology search"
+    },
+    {
+      "id": "eval-18",
+      "category": "entity-lookup",
+      "query": "knowledge base",
+      "expected_entity": "proj-kb-system",
+      "description": "Entity resolution via alias 'knowledge base'"
+    },
+    {
+      "id": "eval-19",
+      "category": "context-search",
+      "query": "What decisions have been made about the project architecture?",
+      "expected_top_notes": ["02-projects/AI Knowledge Base System.md"],
+      "description": "Decision-oriented context search"
+    },
+    {
+      "id": "eval-20",
+      "category": "fts-search",
+      "query": "SQLite FTS5 BM25",
+      "expected_notes": ["01-wiki/Retrieval Cascade.md"],
+      "description": "Technical implementation detail search"
+    },
+    {
+      "id": "eval-21",
+      "category": "resource",
+      "query": "Read the master index resource",
+      "resource_uri": "kb://indexes/master",
+      "expected_content_contains": "Master Index",
+      "description": "MCP resource read should return master index content"
+    },
+    {
+      "id": "eval-22",
+      "category": "resource",
+      "query": "Read the agent policy resource",
+      "resource_uri": "kb://policy/agent",
+      "expected_content_contains": "Agent Policy",
+      "description": "MCP resource read should return agent policy"
+    },
+    {
+      "id": "eval-23",
+      "category": "fts-search",
+      "query": "write access memory candidates sessions",
+      "expected_notes": ["07-indexes/agent-policy.md"],
+      "description": "Search for write permission information"
+    },
+    {
+      "id": "eval-24",
+      "category": "context-search",
+      "query": "How do I add new knowledge to the base?",
+      "expected_top_notes": ["07-indexes/vault-schema.md", "07-indexes/agent-policy.md"],
+      "description": "Workflow-oriented context search"
+    },
+    {
+      "id": "eval-25",
+      "category": "entity-lookup",
+      "query": "hybrid retrieval",
+      "expected_entity": "concept-retrieval-cascade",
+      "description": "Entity resolution via alias 'hybrid retrieval'"
+    }
+  ]
+}
