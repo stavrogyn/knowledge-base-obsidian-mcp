@@ -1,5 +1,6 @@
 import { getDb } from "../index/sqlite.js";
 import { reindexVault } from "../index/indexer.js";
+import { config } from "../config.js";
 
 export interface LintIssue {
   severity: "error" | "warning" | "info";
@@ -132,11 +133,11 @@ function runLintChecks(): LintIssue[] {
       `SELECT n.id, n.path, n.title
        FROM notes n
        WHERE n.id NOT IN (SELECT DISTINCT dst_id FROM links WHERE dst_id IS NOT NULL)
-         AND n.path NOT LIKE '07-indexes/%'
-         AND n.path NOT LIKE '08-templates/%'
+         AND n.path NOT LIKE ?
+         AND n.path NOT LIKE ?
          AND n.type NOT IN ('session', 'memory-fact')`
     )
-    .all() as { id: string; path: string; title: string }[];
+    .all(`${config.dirs.indexes}/%`, `${config.dirs.templates}/%`) as { id: string; path: string; title: string }[];
 
   for (const orphan of orphans) {
     issues.push({
@@ -173,9 +174,9 @@ function runLintChecks(): LintIssue[] {
        FROM notes n
        LEFT JOIN aliases a ON a.note_id = n.id AND a.alias != n.title
        WHERE a.alias IS NULL
-         AND n.path NOT LIKE '08-templates/%'`
+         AND n.path NOT LIKE ?`
     )
-    .all() as { id: string; path: string; title: string }[];
+    .all(`${config.dirs.templates}/%`) as { id: string; path: string; title: string }[];
 
   for (const note of noAliases) {
     issues.push({

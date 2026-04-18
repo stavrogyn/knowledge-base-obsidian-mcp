@@ -3,12 +3,10 @@
  * Run with: npx tsx eval/run-eval.ts
  */
 
+import "./load-env.js";
 import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-
-// Point to vault
-process.env.KB_VAULT_PATH = process.env.KB_VAULT_PATH || resolve(process.env.HOME || "", "knowledge-base");
 
 import { reindexVault } from "../src/index/indexer.js";
 import { ftsSearch } from "../src/index/fts.js";

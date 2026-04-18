@@ -38,8 +38,9 @@ export function compileRawToWiki(input: CompileRawInput): WriteResult {
 
   const id = `wiki-${slug}`;
   const safeTitle = sanitizeFilename(input.title);
+  const wikiEsc = config.dirs.wiki.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const baseDir = input.directory
-    ? `${config.dirs.wiki}/${input.directory.replace(/^01-wiki\/?/, "").replace(/\/+$/, "")}`
+    ? `${config.dirs.wiki}/${input.directory.replace(new RegExp(`^${wikiEsc}/?`), "").replace(/\/+$/, "")}`
     : config.dirs.wiki;
   const relativePath = `${baseDir}/${safeTitle}.md`;
 

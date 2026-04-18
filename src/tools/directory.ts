@@ -3,6 +3,8 @@ import { resolve, normalize, sep } from "path";
 import { config } from "../config.js";
 import { writeNote, type WriteResult } from "../vault/writer.js";
 
+const wikiExamplePath = `${config.dirs.wiki}/tech/devops`;
+
 export const createDirectoryToolDef = {
   name: "kb_create_directory",
   description:
@@ -14,8 +16,7 @@ export const createDirectoryToolDef = {
     properties: {
       path: {
         type: "string",
-        description:
-          "Relative path for the directory (e.g., '01-wiki/tech/devops' or '01-wiki/finance')",
+        description: `Relative path for the directory (e.g., '${wikiExamplePath}' or '${config.dirs.wiki}/finance')`,
       },
       title: {
         type: "string",
@@ -80,8 +81,9 @@ export function handleCreateDirectory(args: {
     mkdirSync(fullPath, { recursive: true });
   }
 
+  const wikiEsc = config.dirs.wiki.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const slug = normalized
-    .replace(/^01-wiki\//, "")
+    .replace(new RegExp(`^${wikiEsc}/`), "")
     .replace(/\//g, "-");
   const topicId = `topic-${slug}`;
   const dateStr = new Date().toISOString().slice(0, 10);
