@@ -2,6 +2,7 @@ import { resolveEntity } from "../retrieval/entity.js";
 import { getBacklinks, getNeighborhood, getRecentSessions } from "../retrieval/structural.js";
 import { readNote } from "../vault/reader.js";
 import { getRecentNotes } from "../retrieval/structural.js";
+import { config } from "../config.js";
 
 export const getEntityToolDef = {
   name: "kb_get_entity",
@@ -96,14 +97,14 @@ export const listRecentToolDef = {
   name: "kb_list_recent",
   description:
     "List recently updated notes in the knowledge base. " +
-    "Optionally scope to a specific directory (e.g., '06-sessions' for recent sessions).",
+    `Optionally scope to a specific directory (e.g., '${config.dirs.sessions}' for recent sessions).`,
   inputSchema: {
     type: "object" as const,
     properties: {
       scope: {
         type: "string",
         description:
-          "Directory scope (e.g., '01-wiki', '02-projects', '06-sessions'). Default: all",
+          `Directory scope (e.g., '${config.dirs.wiki}', '${config.dirs.projects}', '${config.dirs.sessions}'). Default: all`,
       },
       limit: {
         type: "number",

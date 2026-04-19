@@ -10,6 +10,7 @@ import {
 import { reindexVault } from "./index/indexer.js";
 import { closeDb } from "./index/sqlite.js";
 import { readNoteRaw } from "./vault/reader.js";
+import { config } from "./config.js";
 
 import { searchToolDef, handleSearch, contextSearchToolDef, handleContextSearch } from "./tools/search.js";
 import { readToolDef, handleRead } from "./tools/read.js";
@@ -99,14 +100,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // --- Resources ---
 
-const RESOURCE_URIS = {
-  "kb://indexes/master": "07-indexes/master-index.md",
-  "kb://policy/agent": "07-indexes/agent-policy.md",
-  "kb://schema/vault": "07-indexes/vault-schema.md",
-  "kb://indexes/concepts": "07-indexes/concepts.md",
-  "kb://indexes/projects": "07-indexes/projects.md",
-  "kb://indexes/recent-changes": "07-indexes/recent-changes.md",
+const RESOURCE_INDEX_FILES = {
+  "kb://indexes/master": "master-index.md",
+  "kb://policy/agent": "agent-policy.md",
+  "kb://schema/vault": "vault-schema.md",
+  "kb://indexes/concepts": "concepts.md",
+  "kb://indexes/projects": "projects.md",
+  "kb://indexes/recent-changes": "recent-changes.md",
 } as const;
+
+function resourceVaultPath(uri: keyof typeof RESOURCE_INDEX_FILES): string {
+  return `${config.dirs.indexes}/${RESOURCE_INDEX_FILES[uri]}`;
+}
 
 server.setRequestHandler(ListResourcesRequestSchema, async () => ({
   resources: [
@@ -150,13 +155,14 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => ({
 }));
 
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-  const uri = request.params.uri as keyof typeof RESOURCE_URIS;
-  const path = RESOURCE_URIS[uri];
+  const uri = request.params.uri as keyof typeof RESOURCE_INDEX_FILES;
+  const file = RESOURCE_INDEX_FILES[uri];
 
-  if (!path) {
+  if (!file) {
     throw new Error(`Unknown resource: ${uri}`);
   }
 
+  const path = resourceVaultPath(uri);
   const content = readNoteRaw(path);
   if (!content) {
     throw new Error(`Resource not found: ${uri}`);

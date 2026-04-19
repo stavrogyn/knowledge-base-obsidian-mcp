@@ -1,36 +1,33 @@
-import { resolve } from "path";
+import { config as loadDotenv } from "dotenv";
+import { dirname, join, resolve } from "path";
+import { fileURLToPath } from "url";
 import { homedir } from "os";
+import { loadVaultDirsFromEnv, writableDirsFromLayout, type VaultDirs } from "./vault-layout.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+loadDotenv({ path: resolve(__dirname, "../.env"), quiet: true });
 
 function resolveHome(p: string): string {
   if (p.startsWith("~/")) return resolve(homedir(), p.slice(2));
   return resolve(p);
 }
 
+const vaultPath = resolveHome(process.env.KB_VAULT_PATH || "~/knowledge-base");
+const dbPath = process.env.KB_DB_PATH
+  ? resolveHome(process.env.KB_DB_PATH)
+  : join(vaultPath, ".kb-index.db");
+
+const dirs: VaultDirs = loadVaultDirsFromEnv();
+
 export const config = {
-  vaultPath: resolveHome(process.env.KB_VAULT_PATH || "~/knowledge-base"),
-  dbPath: resolveHome(
-    process.env.KB_DB_PATH || "~/knowledge-base/.kb-index.db"
-  ),
+  vaultPath,
+  dbPath,
 
-  dirs: {
-    raw: "00-raw",
-    wiki: "01-wiki",
-    projects: "02-projects",
-    people: "03-people",
-    decisions: "04-decisions",
-    agentMemory: "05-agent-memory",
-    sessions: "06-sessions",
-    indexes: "07-indexes",
-    templates: "08-templates",
-    archive: "99-archive",
-  },
+  /** Top-level folder names (defaults + KB_VAULT_DIRS_JSON / KB_DIR_* env). */
+  dirs,
 
-  writableDirs: [
-    "01-wiki",
-    "05-agent-memory",
-    "06-sessions",
-    "07-indexes",
-  ],
+  /** Agent-writable roots — derived from dirs (wiki, agent memory, sessions, indexes). */
+  writableDirs: writableDirsFromLayout(dirs),
 
   retrieval: {
     maxNotes: 8,

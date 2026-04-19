@@ -4,5 +4,15 @@ dist/
 *.db-wal
 *.db-shm
 .kb-audit.jsonl
+
+# Secrets — never commit real values (templates below are allowed)
 .env
 .env.*
+!.env.template
+!.env.example
+
+# OS / editor
+.DS_Store
+
+# Interrupted vault layout migration
+.kb-layout-migrate-staging/

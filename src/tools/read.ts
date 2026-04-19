@@ -1,12 +1,13 @@
 import { readNote, readNoteRaw } from "../vault/reader.js";
 import { auditLog } from "../vault/audit.js";
+import { config } from "../config.js";
 
 export const readToolDef = {
   name: "kb_read",
   description:
     "Read a note from the knowledge base by path or title. " +
     "Returns the full note content including frontmatter metadata. " +
-    "Paths are relative to the vault root (e.g., '01-wiki/Model Context Protocol.md').",
+    `Paths are relative to the vault root (e.g., '${config.dirs.wiki}/Model Context Protocol.md').`,
   inputSchema: {
     type: "object" as const,
     properties: {

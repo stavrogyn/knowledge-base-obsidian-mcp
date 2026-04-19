@@ -1,12 +1,13 @@
 import { writeSessionSummary, type SessionSummaryInput } from "../memory/session.js";
 import { createMemoryCandidate, type MemoryCandidateInput } from "../memory/candidate.js";
+import { config } from "../config.js";
 
 export const writeSessionSummaryToolDef = {
   name: "kb_write_session_summary",
   description:
     "Write a session summary to the knowledge base. Call this at the end of a conversation " +
     "to persist what was discussed, decisions made, and key facts learned. " +
-    "Summaries are stored in 06-sessions/ with review_status: draft.",
+    `Summaries are stored in ${config.dirs.sessions}/ with review_status: draft.`,
   inputSchema: {
     type: "object" as const,
     properties: {
@@ -75,7 +76,7 @@ export const createMemoryCandidateToolDef = {
   name: "kb_create_memory_candidate",
   description:
     "Create a memory candidate -- a durable fact extracted from the current session. " +
-    "Candidates are stored in 05-agent-memory/candidates/ with review_status: draft. " +
+    `Candidates are stored in ${config.dirs.agentMemory}/candidates/ with review_status: draft. ` +
     "They require human review before being promoted to the main knowledge base.",
   inputSchema: {
     type: "object" as const,
